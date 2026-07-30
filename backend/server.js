@@ -11,10 +11,22 @@ connectDB();
 
 const app = express();
 
-// CORS Configuration (Frontend 5173 ko allow karne ke liye)
+
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://foundation-app-lac.vercel.app' // 
+];
+
 const corsOptions = {
-  origin: 'http://localhost:5173', 
-  credentials: true, 
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.log('❌ CORS blocked for:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
   optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
