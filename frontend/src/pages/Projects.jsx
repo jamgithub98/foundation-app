@@ -4,15 +4,27 @@ import API from '../api/axios';
 const Projects = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
+        console.log('📡 Fetching projects...');
         const { data } = await API.get('/projects');
-        setProjects(data);
+        console.log('📦 Raw Data received:', data);
+
+        // Check karo ki data array hai ya nahi
+        if (Array.isArray(data)) {
+          setProjects(data);
+        } else {
+          console.error('❌ Data is NOT an array!', data);
+          setError('Received invalid data format from server');
+          setProjects([]);
+        }
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching projects:', error);
+        console.error('❌ Fetch Error:', error);
+        setError(error.message || 'Failed to load projects');
         setLoading(false);
       }
     };
@@ -23,6 +35,21 @@ const Projects = () => {
     return (
       <div className="flex justify-center items-center min-h-screen pt-20">
         <span className="loading loading-spinner loading-lg text-primary"></span>
+      </div>
+    );
+  }
+
+  // Agar error hai toh screen par dikhao
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 pt-24 pb-10 text-center">
+        <h1 className="text-4xl font-bold text-center mb-10">Our Projects</h1>
+        <div className="alert alert-error shadow-lg max-w-md mx-auto">
+          <div>
+            <span>🚨 Error: {error}</span>
+          </div>
+        </div>
+        <p className="text-gray-500 mt-4">Please check console for details.</p>
       </div>
     );
   }
