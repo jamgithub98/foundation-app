@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'http://localhost:5003/api',  // <-- 5003 hona chahiye
+  baseURL: 'https://foundation-backend-u8s2.onrender.com/api',
 });
 
 API.interceptors.request.use((config) => {
