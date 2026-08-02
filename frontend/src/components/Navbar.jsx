@@ -60,7 +60,7 @@ const Navbar = () => {
                   <li><Link to="/admin" onClick={closeDrawer}>📊 Dashboard</Link></li>
                   <li><Link to="/change-password" onClick={closeDrawer}>🔒 Change Password</Link></li>
                   <li><Link to="/add-user" onClick={closeDrawer}>👤 Add New Admin</Link></li>
-                  <li><hr className="my-1" /></li>
+                  <li><div className="border-t border-gray-300 opacity-50 my-1"></div></li>
                   <li><button onClick={handleLogout}>🚪 Logout</button></li>
                 </ul>
               </div>
