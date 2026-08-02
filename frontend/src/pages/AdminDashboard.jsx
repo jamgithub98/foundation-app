@@ -86,7 +86,7 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="p-4 md:p-8 pt-40 max-w-6xl mx-auto">
+    <div className="p-4 md:p-8 pt-72 max-w-6xl mx-auto border-4 border-red-500">
       <h1 className="text-3xl font-bold mb-6">📦 Project Management</h1>
 
       {/* Add Project Form */}
