@@ -33,7 +33,6 @@ const ChangePassword = () => {
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
-      // Optionally redirect after success
       setTimeout(() => navigate('/admin'), 2000);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to change password');
