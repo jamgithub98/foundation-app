@@ -7,12 +7,22 @@ const AdminDashboard = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
+  // Project States
   const [projects, setProjects] = useState([]);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
   const [uploading, setUploading] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
+
+  // Edit Modal States
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editId, setEditId] = useState('');
+  const [editTitle, setEditTitle] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [editCategory, setEditCategory] = useState('');
+  const [editImageUrl, setEditImageUrl] = useState('');
+  const [editUploading, setEditUploading] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -21,6 +31,7 @@ const AdminDashboard = () => {
     fetchProjects();
   }, [user, loading, navigate]);
 
+  // Fetch all projects
   const fetchProjects = async () => {
     try {
       const { data } = await API.get('/projects');
@@ -30,14 +41,13 @@ const AdminDashboard = () => {
     }
   };
 
+  // Image Upload for Add
   const uploadFileHandler = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
     const formData = new FormData();
     formData.append('image', file);
     setUploading(true);
-
     try {
       const { data } = await API.post('/upload', formData);
       setImageUrl(data.imageUrl);
@@ -49,10 +59,10 @@ const AdminDashboard = () => {
     }
   };
 
+  // Add Project
   const submitHandler = async (e) => {
     e.preventDefault();
     if (!imageUrl) return alert('Please upload an image first');
-
     try {
       await API.post('/projects', { title, description, imageUrl, category });
       alert('✅ Project created successfully!');
@@ -66,6 +76,7 @@ const AdminDashboard = () => {
     }
   };
 
+  // Delete Project
   const deleteHandler = async (id) => {
     if (window.confirm('Delete this project?')) {
       try {
@@ -74,6 +85,61 @@ const AdminDashboard = () => {
       } catch (error) {
         alert('❌ Error deleting project');
       }
+    }
+  };
+
+  // --- Edit Functions ---
+  const openEditModal = (project) => {
+    setEditId(project._id);
+    setEditTitle(project.title);
+    setEditDescription(project.description);
+    setEditCategory(project.category || '');
+    setEditImageUrl(project.imageUrl);
+    setEditModalOpen(true);
+  };
+
+  const closeEditModal = () => {
+    setEditModalOpen(false);
+    setEditId('');
+    setEditTitle('');
+    setEditDescription('');
+    setEditCategory('');
+    setEditImageUrl('');
+  };
+
+  // Image Upload for Edit
+  const editUploadFileHandler = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('image', file);
+    setEditUploading(true);
+    try {
+      const { data } = await API.post('/upload', formData);
+      setEditImageUrl(data.imageUrl);
+      alert('✅ New image uploaded successfully!');
+    } catch (err) {
+      alert('❌ Upload failed: ' + (err.response?.data?.message || err.message));
+    } finally {
+      setEditUploading(false);
+    }
+  };
+
+  // Update Project
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await API.put(`/projects/${editId}`, {
+        title: editTitle,
+        description: editDescription,
+        category: editCategory,
+        imageUrl: editImageUrl,
+      });
+      alert('✅ Project updated successfully!');
+      closeEditModal();
+      fetchProjects();
+    } catch (error) {
+      alert('❌ Error updating project: ' + (error.response?.data?.message || error.message));
     }
   };
 
@@ -86,7 +152,7 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="p-4 md:p-8 pt-40 max-w-6xl mx-auto">
+    <div className="p-4 md:p-8 pt-60 max-w-6xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">📦 Project Management</h1>
 
       {/* Add Project Form */}
@@ -141,15 +207,83 @@ const AdminDashboard = () => {
             <div className="card-body">
               <h2 className="card-title">{p.title}</h2>
               <p className="truncate">{p.description}</p>
-              <div className="card-actions justify-end">
-                <button onClick={() => deleteHandler(p._id)} className="btn btn-error btn-sm">
-                  Delete
+              <div className="badge badge-primary badge-outline mt-2">{p.category}</div>
+              <div className="card-actions justify-end mt-4">
+                {/* Edit Button */}
+                <button
+                  onClick={() => openEditModal(p)}
+                  className="btn btn-primary btn-sm"
+                >
+                  ✏️ Edit
+                </button>
+                {/* Delete Button */}
+                <button
+                  onClick={() => deleteHandler(p._id)}
+                  className="btn btn-error btn-sm"
+                >
+                  🗑️ Delete
                 </button>
               </div>
             </div>
           </div>
         ))}
       </div>
+
+      {/* --- Edit Modal (Popup) --- */}
+      {editModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50 backdrop-blur-sm">
+          <div className="modal-box relative bg-base-100 p-6 rounded-xl shadow-2xl max-w-lg w-full">
+            <h3 className="font-bold text-2xl mb-4">✏️ Edit Project</h3>
+            <form onSubmit={handleEditSubmit} className="space-y-4">
+              <input
+                type="text"
+                placeholder="Title"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                className="input input-bordered w-full"
+                required
+              />
+              <textarea
+                placeholder="Description"
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
+                className="textarea textarea-bordered w-full"
+                required
+              />
+              <input
+                type="text"
+                placeholder="Category"
+                value={editCategory}
+                onChange={(e) => setEditCategory(e.target.value)}
+                className="input input-bordered w-full"
+              />
+              <div>
+                <p className="text-sm font-semibold mb-1">Current Image:</p>
+                <img src={editImageUrl} alt="Current" className="h-20 w-20 object-cover rounded-lg border" />
+                <input
+                  type="file"
+                  onChange={editUploadFileHandler}
+                  className="file-input file-input-bordered w-full mt-2"
+                  accept="image/*"
+                />
+                {editUploading && <span className="ml-2 text-primary">Uploading...</span>}
+              </div>
+              <div className="flex gap-2 mt-4">
+                <button type="submit" className="btn btn-primary flex-1" disabled={editUploading}>
+                  💾 Save Changes
+                </button>
+                <button
+                  type="button"
+                  onClick={closeEditModal}
+                  className="btn btn-ghost flex-1"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

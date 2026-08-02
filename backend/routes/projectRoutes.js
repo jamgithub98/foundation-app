@@ -23,4 +23,28 @@ router.delete('/:id', protect, async (req, res) => {
   res.json({ message: 'Project deleted successfully' });
 });
 
+// @route PUT /api/projects/:id
+// @desc Update a project (Admin only)
+router.put('/:id', protect, async (req, res) => {
+  const { title, description, imageUrl, category } = req.body;
+
+  try {
+    const project = await Project.findById(req.params.id);
+    if (!project) {
+      return res.status(404).json({ message: 'Project not found' });
+    }
+
+    // Update only the fields that are provided
+    project.title = title || project.title;
+    project.description = description || project.description;
+    project.imageUrl = imageUrl || project.imageUrl;
+    project.category = category || project.category;
+
+    await project.save();
+    res.json(project);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 export default router;
