@@ -1,2 +1,6 @@
 @import "tailwindcss";
 @plugin "daisyui";
+/* Hide dropdown arrow indicator */
+.dropdown .btn-ghost::after {
+  display: none !important;
+}

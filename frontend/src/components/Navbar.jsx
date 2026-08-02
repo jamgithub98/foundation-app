@@ -51,11 +51,11 @@ const Navbar = () => {
           <div className="flex-none">
             {user ? (
               <div className="dropdown dropdown-end">
-                <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
-                  <div className="w-10 rounded-full bg-primary text-white flex items-center justify-center">
-                    {user.name?.charAt(0).toUpperCase()}
-                  </div>
-                </label>
+                <button className="btn btn-ghost btn-circle avatar">
+  <div className="w-10 rounded-full bg-primary text-white flex items-center justify-center">
+    {user.name?.charAt(0).toUpperCase()}
+  </div>
+</button>
                 <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
                   <li><Link to="/admin" onClick={closeDrawer}>📊 Dashboard</Link></li>
                   <li><Link to="/change-password" onClick={closeDrawer}>🔒 Change Password</Link></li>
