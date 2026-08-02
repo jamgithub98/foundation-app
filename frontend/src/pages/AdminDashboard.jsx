@@ -7,27 +7,12 @@ const AdminDashboard = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
-  // --- Project States ---
   const [projects, setProjects] = useState([]);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
   const [uploading, setUploading] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
-
-  // --- Change Password States ---
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [passMsg, setPassMsg] = useState('');
-  const [passError, setPassError] = useState('');
-
-  // --- Add User States ---
-  const [newName, setNewName] = useState('');
-  const [newEmail, setNewEmail] = useState('');
-  const [newPass, setNewPass] = useState('');
-  const [userMsg, setUserMsg] = useState('');
-  const [userError, setUserError] = useState('');
 
   useEffect(() => {
     if (!loading && !user) {
@@ -36,7 +21,6 @@ const AdminDashboard = () => {
     fetchProjects();
   }, [user, loading, navigate]);
 
-  // --- Project Functions ---
   const fetchProjects = async () => {
     try {
       const { data } = await API.get('/projects');
@@ -65,7 +49,7 @@ const AdminDashboard = () => {
     }
   };
 
-  const submitProjectHandler = async (e) => {
+  const submitHandler = async (e) => {
     e.preventDefault();
     if (!imageUrl) return alert('Please upload an image first');
 
@@ -93,61 +77,6 @@ const AdminDashboard = () => {
     }
   };
 
-  // --- Change Password Handler ---
-  const changePasswordHandler = async (e) => {
-    e.preventDefault();
-    setPassMsg('');
-    setPassError('');
-
-    if (newPassword !== confirmPassword) {
-      setPassError('New passwords do not match');
-      return;
-    }
-    if (newPassword.length < 6) {
-      setPassError('Password must be at least 6 characters');
-      return;
-    }
-
-    try {
-      const { data } = await API.put('/auth/change-password', {
-        currentPassword,
-        newPassword,
-      });
-      setPassMsg(data.message);
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
-    } catch (error) {
-      setPassError(error.response?.data?.message || 'Failed to change password');
-    }
-  };
-
-  // --- Add User Handler ---
-  const addUserHandler = async (e) => {
-    e.preventDefault();
-    setUserMsg('');
-    setUserError('');
-
-    if (newPass.length < 6) {
-      setUserError('Password must be at least 6 characters');
-      return;
-    }
-
-    try {
-      const { data } = await API.post('/auth/admin/register', {
-        name: newName,
-        email: newEmail,
-        password: newPass,
-      });
-      setUserMsg(`✅ User ${data.name} created successfully!`);
-      setNewName('');
-      setNewEmail('');
-      setNewPass('');
-    } catch (error) {
-      setUserError(error.response?.data?.message || 'Failed to create user');
-    }
-  };
-
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -157,136 +86,53 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="p-4 md:p-8 pt-24 max-w-7xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
+    <div className="p-4 md:p-8 pt-24 max-w-6xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6">📦 Project Management</h1>
 
-      {/* --- GRID: 2 Columns (Project Form left, User/Password right) --- */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
-        
-        {/* LEFT COLUMN: Add Project */}
-        <div className="card bg-base-100 shadow-xl p-6">
-          <h2 className="text-2xl font-semibold mb-4">Add New Project</h2>
-          <form onSubmit={submitProjectHandler} className="space-y-4">
+      {/* Add Project Form */}
+      <div className="card bg-base-100 shadow-xl p-6 mb-10">
+        <h2 className="text-2xl font-semibold mb-4">Add New Project</h2>
+        <form onSubmit={submitHandler} className="space-y-4">
+          <input
+            type="text"
+            placeholder="Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="input input-bordered w-full"
+            required
+          />
+          <textarea
+            placeholder="Description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="textarea textarea-bordered w-full"
+            required
+          />
+          <input
+            type="text"
+            placeholder="Category (e.g. Education)"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="input input-bordered w-full"
+          />
+          <div>
             <input
-              type="text"
-              placeholder="Title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="input input-bordered w-full"
-              required
+              type="file"
+              onChange={uploadFileHandler}
+              className="file-input file-input-bordered w-full"
+              accept="image/*"
             />
-            <textarea
-              placeholder="Description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="textarea textarea-bordered w-full"
-              required
-            />
-            <input
-              type="text"
-              placeholder="Category (e.g. Education)"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="input input-bordered w-full"
-            />
-
-            <div>
-              <input
-                type="file"
-                onChange={uploadFileHandler}
-                className="file-input file-input-bordered w-full"
-                accept="image/*"
-              />
-              {uploading && <span className="ml-2 text-primary">Uploading...</span>}
-              {imageUrl && <div className="mt-2 badge badge-success">Image Uploaded ✅</div>}
-            </div>
-
-            <button type="submit" className="btn btn-primary w-full" disabled={uploading}>
-              Add Project
-            </button>
-          </form>
-        </div>
-
-        {/* RIGHT COLUMN: Change Password & Add User */}
-        <div className="flex flex-col gap-6">
-          
-          {/* Change Password Card */}
-          <div className="card bg-base-100 shadow-xl p-6">
-            <h2 className="text-xl font-semibold mb-3">🔒 Change Password</h2>
-            <form onSubmit={changePasswordHandler} className="space-y-3">
-              <input
-                type="password"
-                placeholder="Current Password"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                className="input input-bordered w-full"
-                required
-              />
-              <input
-                type="password"
-                placeholder="New Password (min 6 chars)"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="input input-bordered w-full"
-                required
-              />
-              <input
-                type="password"
-                placeholder="Confirm New Password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="input input-bordered w-full"
-                required
-              />
-              {passMsg && <p className="text-success text-sm">{passMsg}</p>}
-              {passError && <p className="text-error text-sm">{passError}</p>}
-              <button type="submit" className="btn btn-secondary w-full">
-                Update Password
-              </button>
-            </form>
+            {uploading && <span className="ml-2 text-primary">Uploading...</span>}
+            {imageUrl && <div className="mt-2 badge badge-success">Image Uploaded ✅</div>}
           </div>
-
-          {/* Add New Admin User Card */}
-          <div className="card bg-base-100 shadow-xl p-6">
-            <h2 className="text-xl font-semibold mb-3">👤 Add New Admin User</h2>
-            <form onSubmit={addUserHandler} className="space-y-3">
-              <input
-                type="text"
-                placeholder="Full Name"
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                className="input input-bordered w-full"
-                required
-              />
-              <input
-                type="email"
-                placeholder="Email Address"
-                value={newEmail}
-                onChange={(e) => setNewEmail(e.target.value)}
-                className="input input-bordered w-full"
-                required
-              />
-              <input
-                type="password"
-                placeholder="Password (min 6 chars)"
-                value={newPass}
-                onChange={(e) => setNewPass(e.target.value)}
-                className="input input-bordered w-full"
-                required
-              />
-              {userMsg && <p className="text-success text-sm">{userMsg}</p>}
-              {userError && <p className="text-error text-sm">{userError}</p>}
-              <button type="submit" className="btn btn-accent w-full">
-                Add User
-              </button>
-            </form>
-          </div>
-
-        </div>
+          <button type="submit" className="btn btn-primary w-full" disabled={uploading}>
+            Add Project
+          </button>
+        </form>
       </div>
 
-      {/* --- Projects List (Full Width) --- */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+      {/* Projects List */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {projects.map((p) => (
           <div key={p._id} className="card bg-base-100 shadow-xl">
             <figure>

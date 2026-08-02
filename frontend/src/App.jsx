@@ -5,10 +5,12 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
 import About from './pages/About';
-import Projects from './pages/Projects';  // Real component import
+import Projects from './pages/Projects';
 import Contact from './pages/Contact';
 import Login from './pages/Login';
-import AdminDashboard from './pages/AdminDashboard';  // Real component import
+import AdminDashboard from './pages/AdminDashboard';
+import ChangePassword from './pages/ChangePassword';  // <-- NEW
+import AddUser from './pages/AddUser';                // <-- NEW
 
 function App() {
   return (
@@ -18,10 +20,13 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
-          <Route path="/projects" element={<Projects />} />  {/* Real component */}
+          <Route path="/projects" element={<Projects />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/admin" element={<AdminDashboard />} />  {/* Real component */}
+          <Route path="/admin" element={<AdminDashboard />} />
+          {/* NEW ROUTES */}
+          <Route path="/change-password" element={<ChangePassword />} />
+          <Route path="/add-user" element={<AddUser />} />
         </Routes>
         <Footer />
       </AuthProvider>

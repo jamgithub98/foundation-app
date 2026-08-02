@@ -18,32 +18,27 @@ const Navbar = () => {
 
   return (
     <div className="drawer z-50">
-      {/* Toggle (Checkbox) for Drawer */}
-      <input 
-        id="my-drawer" 
-        type="checkbox" 
-        className="drawer-toggle" 
-        checked={isDrawerOpen} 
-        onChange={() => setIsDrawerOpen(!isDrawerOpen)} 
+      <input
+        id="my-drawer"
+        type="checkbox"
+        className="drawer-toggle"
+        checked={isDrawerOpen}
+        onChange={() => setIsDrawerOpen(!isDrawerOpen)}
       />
-      
-      {/* Navbar Content (jo upar dikhta hai) */}
+
       <div className="drawer-content">
         <div className="navbar bg-base-100 shadow-md px-4 fixed top-0">
           <div className="flex-1">
-            {/* Hamburger Icon (Mobile ke liye) */}
             <label htmlFor="my-drawer" className="btn btn-square btn-ghost lg:hidden">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-6 h-6 stroke-current">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </label>
-            {/* Logo */}
             <Link to="/" className="btn btn-ghost text-xl font-bold text-primary" onClick={closeDrawer}>
               ❤️ Ettihad Foundation
             </Link>
           </div>
 
-          {/* Desktop Menu (lg screen par dikhega) */}
           <div className="hidden lg:flex lg:flex-1 lg:justify-center">
             <ul className="menu menu-horizontal px-1 gap-1">
               <li><Link to="/">Home</Link></li>
@@ -53,7 +48,6 @@ const Navbar = () => {
             </ul>
           </div>
 
-          {/* Right side (Login/Avatar) */}
           <div className="flex-none">
             {user ? (
               <div className="dropdown dropdown-end">
@@ -63,8 +57,11 @@ const Navbar = () => {
                   </div>
                 </label>
                 <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
-                  <li><Link to="/admin" onClick={closeDrawer}>Dashboard</Link></li>
-                  <li><button onClick={handleLogout}>Logout</button></li>
+                  <li><Link to="/admin" onClick={closeDrawer}>📊 Dashboard</Link></li>
+                  <li><Link to="/change-password" onClick={closeDrawer}>🔒 Change Password</Link></li>
+                  <li><Link to="/add-user" onClick={closeDrawer}>👤 Add New Admin</Link></li>
+                  <li><hr className="my-1" /></li>
+                  <li><button onClick={handleLogout}>🚪 Logout</button></li>
                 </ul>
               </div>
             ) : (
@@ -74,7 +71,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Drawer Sidebar (Mobile par slide karega) */}
       <div className="drawer-side">
         <label htmlFor="my-drawer" className="drawer-overlay"></label>
         <ul className="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
@@ -86,6 +82,8 @@ const Navbar = () => {
             <>
               <div className="divider"></div>
               <li><Link to="/admin" onClick={closeDrawer}>⚙️ Dashboard</Link></li>
+              <li><Link to="/change-password" onClick={closeDrawer}>🔒 Change Password</Link></li>
+              <li><Link to="/add-user" onClick={closeDrawer}>👤 Add New Admin</Link></li>
               <li><button onClick={handleLogout}>🚪 Logout</button></li>
             </>
           )}
